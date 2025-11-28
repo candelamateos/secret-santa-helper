@@ -7,10 +7,13 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const JoinGroup = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [groupCode, setGroupCode] = useState("");
   const [yourName, setYourName] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,7 +21,7 @@ const JoinGroup = () => {
   const handleJoinGroup = async () => {
     if (!groupCode.trim() || !yourName.trim()) {
       toast({
-        title: "Please fill in all fields",
+        title: t('fillAllFields'),
         variant: "destructive"
       });
       return;
@@ -36,8 +39,8 @@ const JoinGroup = () => {
 
       if (groupError || !group) {
         toast({
-          title: "Group not found",
-          description: "Please check the code and try again",
+          title: t('groupNotFound'),
+          description: t('checkCode'),
           variant: "destructive"
         });
         setLoading(false);
@@ -62,14 +65,14 @@ const JoinGroup = () => {
       if (participantError) throw participantError;
 
       toast({
-        title: "Successfully joined!",
-        description: `Welcome to ${group.name}`
+        title: t('successfullyJoined'),
+        description: `${t('welcomeTo')} ${group.name}`
       });
 
       navigate(`/group/${group.id}?participant_code=${participantCode}`);
     } catch (error: any) {
       toast({
-        title: "Error joining group",
+        title: t('errorJoiningGroup'),
         description: error.message,
         variant: "destructive"
       });
@@ -80,6 +83,7 @@ const JoinGroup = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+      <LanguageSwitcher />
       <div className="container mx-auto px-4 py-12 max-w-2xl">
         <Button 
           variant="ghost" 
@@ -87,7 +91,7 @@ const JoinGroup = () => {
           className="mb-8 text-lg"
         >
           <ArrowLeft className="w-5 h-5 mr-2" />
-          Back
+          {t('back')}
         </Button>
 
         <ChristmasCard>
@@ -95,32 +99,32 @@ const JoinGroup = () => {
             <Users className="w-16 h-16 text-secondary" />
           </div>
           
-          <h1 className="text-4xl font-bold text-center mb-3">Join a Group</h1>
+          <h1 className="text-4xl font-bold text-center mb-3">{t('joinAGroup')}</h1>
           <p className="text-center text-lg text-muted-foreground mb-8">
-            Enter the group code to join
+            {t('joinGroupDesc')}
           </p>
 
           <div className="space-y-6">
             <div className="space-y-3">
-              <Label htmlFor="groupCode" className="text-lg">Group Code</Label>
+              <Label htmlFor="groupCode" className="text-lg">{t('groupCode')}</Label>
               <Input
                 id="groupCode"
-                placeholder="e.g., ABC123"
+                placeholder={t('groupCodePlaceholder')}
                 className="h-14 text-lg uppercase"
                 value={groupCode}
                 onChange={(e) => setGroupCode(e.target.value.toUpperCase())}
                 maxLength={6}
               />
               <p className="text-sm text-muted-foreground">
-                Ask the organizer for the 6-character code
+                {t('groupCodeHelper')}
               </p>
             </div>
 
             <div className="space-y-3">
-              <Label htmlFor="yourName" className="text-lg">Your Name</Label>
+              <Label htmlFor="yourName" className="text-lg">{t('yourName')}</Label>
               <Input
                 id="yourName"
-                placeholder="e.g., Sarah"
+                placeholder={t('yourNamePlaceholder2')}
                 className="h-14 text-lg"
                 value={yourName}
                 onChange={(e) => setYourName(e.target.value)}
@@ -132,7 +136,7 @@ const JoinGroup = () => {
               disabled={loading}
               className="w-full h-14 text-xl bg-gradient-to-r from-secondary to-secondary/90 hover:from-secondary/90 hover:to-secondary"
             >
-              {loading ? "Joining..." : "Join Group"}
+              {loading ? t('joining') : t('joinGroupButton')}
             </Button>
           </div>
         </ChristmasCard>

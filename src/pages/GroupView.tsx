@@ -7,10 +7,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const GroupView = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const { groupId } = useParams();
   const [searchParams] = useSearchParams();
   const participantCode = searchParams.get('participant_code');
@@ -99,7 +102,7 @@ const GroupView = () => {
       }
     } catch (error: any) {
       toast({
-        title: "Error loading group",
+        title: t('error'),
         description: error.message,
         variant: "destructive"
       });
@@ -111,8 +114,8 @@ const GroupView = () => {
   const handleDrawNames = async () => {
     if (participants.length < 2) {
       toast({
-        title: "Need more participants",
-        description: "At least 2 people are needed for Secret Santa",
+        title: t('waitingForMore'),
+        description: t('needAtLeast'),
         variant: "destructive"
       });
       return;
@@ -123,14 +126,14 @@ const GroupView = () => {
       if (error) throw error;
 
       toast({
-        title: "Names drawn!",
-        description: "Everyone can now see their assignments"
+        title: t('namesDrawnSuccess'),
+        description: t('namesDrawn')
       });
 
       loadGroupData();
     } catch (error: any) {
       toast({
-        title: "Error drawing names",
+        title: t('errorDrawingNames'),
         description: error.message,
         variant: "destructive"
       });
@@ -147,12 +150,12 @@ const GroupView = () => {
       if (error) throw error;
 
       toast({
-        title: "Wishlist saved!",
-        description: "Your gift ideas have been updated"
+        title: t('wishlistUpdated'),
+        description: ""
       });
     } catch (error: any) {
       toast({
-        title: "Error saving wishlist",
+        title: t('errorUpdatingWishlist'),
         description: error.message,
         variant: "destructive"
       });
@@ -164,21 +167,22 @@ const GroupView = () => {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
     toast({
-      title: "Code copied!",
-      description: "Share this code with others"
+      title: t('shareGroupCode'),
+      description: ""
     });
   };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 flex items-center justify-center">
-        <p className="text-2xl text-muted-foreground">Loading...</p>
+        <p className="text-2xl text-muted-foreground">{t('loading')}</p>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+      <LanguageSwitcher />
       <div className="container mx-auto px-4 py-12 max-w-4xl">
         <Button 
           variant="ghost" 
@@ -186,7 +190,7 @@ const GroupView = () => {
           className="mb-8 text-lg"
         >
           <ArrowLeft className="w-5 h-5 mr-2" />
-          Back to Home
+          {t('back')}
         </Button>
 
         {/* Group Header */}
@@ -194,7 +198,7 @@ const GroupView = () => {
           <div className="text-center">
             <h1 className="text-4xl font-bold mb-4">{group?.name}</h1>
             <div className="flex items-center justify-center gap-2 mb-2">
-              <p className="text-xl text-muted-foreground">Group Code:</p>
+              <p className="text-xl text-muted-foreground">{t('groupCodeLabel')}:</p>
               <code className="text-2xl font-mono font-bold bg-muted px-4 py-2 rounded">
                 {group?.code}
               </code>
@@ -206,7 +210,7 @@ const GroupView = () => {
                 {copied ? <Check className="w-5 h-5 text-green-600" /> : <Copy className="w-5 h-5" />}
               </Button>
             </div>
-            <p className="text-muted-foreground">Share this code with family members</p>
+            <p className="text-muted-foreground">{t('shareGroupCode')}</p>
           </div>
         </ChristmasCard>
 
@@ -214,7 +218,7 @@ const GroupView = () => {
         <ChristmasCard className="mb-6">
           <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
             <Users className="w-6 h-6" />
-            Participants ({participants.length})
+            {t('participants')} ({participants.length})
           </h2>
           <div className="space-y-2">
             {participants.map((p) => (
@@ -223,7 +227,7 @@ const GroupView = () => {
                 <span className="text-lg font-medium">{p.name}</span>
                 {p.id === currentParticipant?.id && (
                   <span className="ml-auto text-sm bg-primary/10 text-primary px-3 py-1 rounded-full">
-                    You
+                    {t('yourName')}
                   </span>
                 )}
               </div>
@@ -236,9 +240,9 @@ const GroupView = () => {
           <ChristmasCard>
             <div className="text-center space-y-4">
               <Sparkles className="w-16 h-16 text-accent mx-auto" />
-              <h2 className="text-3xl font-bold">Ready to Draw Names?</h2>
+              <h2 className="text-3xl font-bold">{t('readyToStart')}</h2>
               <p className="text-lg text-muted-foreground">
-                Once everyone has joined, click below to assign Secret Santas
+                {t('shareGroupCode')}
               </p>
               <Button
                 onClick={handleDrawNames}
@@ -247,10 +251,10 @@ const GroupView = () => {
                 disabled={participants.length < 2}
               >
                 <Sparkles className="w-6 h-6 mr-2" />
-                Draw Names
+                {t('drawNames')}
               </Button>
               {participants.length < 2 && (
-                <p className="text-sm text-destructive">Need at least 2 participants</p>
+                <p className="text-sm text-destructive">{t('needAtLeast')}</p>
               )}
             </div>
           </ChristmasCard>
@@ -259,16 +263,16 @@ const GroupView = () => {
             <ChristmasCard>
               <div className="text-center space-y-4">
                 <Gift className="w-16 h-16 text-primary mx-auto" />
-                <h2 className="text-3xl font-bold">Your Secret Santa Assignment</h2>
+                <h2 className="text-3xl font-bold">{t('yourAssignment')}</h2>
                 <div className="bg-gradient-to-r from-primary/10 to-secondary/10 p-6 rounded-lg">
-                  <p className="text-xl text-muted-foreground mb-2">You're buying a gift for:</p>
+                  <p className="text-xl text-muted-foreground mb-2">{t('youAreGivingTo')}:</p>
                   <p className="text-4xl font-bold text-primary">{assignedPerson.name}</p>
                 </div>
                 {assignedPerson.wishlist && (
                   <div className="text-left bg-muted/30 p-6 rounded-lg">
                     <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
                       <Sparkles className="w-5 h-5" />
-                      Their Wishlist
+                      {t('theirWishlist')}
                     </h3>
                     <p className="text-lg whitespace-pre-wrap">{assignedPerson.wishlist}</p>
                   </div>
@@ -277,16 +281,16 @@ const GroupView = () => {
             </ChristmasCard>
 
             <ChristmasCard>
-              <h2 className="text-2xl font-semibold mb-4">Your Wishlist</h2>
+              <h2 className="text-2xl font-semibold mb-4">{t('yourWishlist')}</h2>
               <p className="text-muted-foreground mb-4">
-                Let your Secret Santa know what you'd like to receive
+                {t('shareGroupCode')}
               </p>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="wishlist" className="text-lg">Gift Ideas</Label>
+                  <Label htmlFor="wishlist" className="text-lg">{t('yourWishlist')}</Label>
                   <Textarea
                     id="wishlist"
-                    placeholder="e.g., Books, coffee, warm socks..."
+                    placeholder={t('wishlistPlaceholder')}
                     className="min-h-[150px] text-lg mt-2"
                     value={wishlist}
                     onChange={(e) => setWishlist(e.target.value)}
@@ -296,7 +300,7 @@ const GroupView = () => {
                   onClick={handleSaveWishlist}
                   className="w-full h-12 text-lg"
                 >
-                  Save Wishlist
+                  {t('wishlistUpdated')}
                 </Button>
               </div>
             </ChristmasCard>
