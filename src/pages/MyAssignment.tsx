@@ -7,17 +7,20 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const MyAssignment = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [participantCode, setParticipantCode] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleViewAssignment = async () => {
     if (!participantCode.trim()) {
       toast({
-        title: "Please enter your code",
+        title: t('enterCode'),
         variant: "destructive"
       });
       return;
@@ -35,8 +38,8 @@ const MyAssignment = () => {
 
       if (error || !participant) {
         toast({
-          title: "Code not found",
-          description: "Please check your code and try again",
+          title: t('codeNotFound'),
+          description: t('checkCode'),
           variant: "destructive"
         });
         setLoading(false);
@@ -46,7 +49,7 @@ const MyAssignment = () => {
       navigate(`/group/${participant.group_id}?participant_code=${participantCode.toUpperCase()}`);
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: t('error'),
         description: error.message,
         variant: "destructive"
       });
@@ -57,6 +60,7 @@ const MyAssignment = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+      <LanguageSwitcher />
       <div className="container mx-auto px-4 py-12 max-w-2xl">
         <Button 
           variant="ghost" 
@@ -64,7 +68,7 @@ const MyAssignment = () => {
           className="mb-8 text-lg"
         >
           <ArrowLeft className="w-5 h-5 mr-2" />
-          Back
+          {t('back')}
         </Button>
 
         <ChristmasCard>
@@ -72,24 +76,24 @@ const MyAssignment = () => {
             <Gift className="w-16 h-16 text-primary" />
           </div>
           
-          <h1 className="text-4xl font-bold text-center mb-3">My Assignment</h1>
+          <h1 className="text-4xl font-bold text-center mb-3">{t('myAssignment')}</h1>
           <p className="text-center text-lg text-muted-foreground mb-8">
-            Enter your participant code to view your Secret Santa assignment
+            {t('myAssignmentDesc')}
           </p>
 
           <div className="space-y-6">
             <div className="space-y-3">
-              <Label htmlFor="participantCode" className="text-lg">Participant Code</Label>
+              <Label htmlFor="participantCode" className="text-lg">{t('participantCode')}</Label>
               <Input
                 id="participantCode"
-                placeholder="e.g., ABC123"
+                placeholder={t('participantCodePlaceholder')}
                 className="h-14 text-lg uppercase"
                 value={participantCode}
                 onChange={(e) => setParticipantCode(e.target.value.toUpperCase())}
                 maxLength={6}
               />
               <p className="text-sm text-muted-foreground">
-                You received this code when you joined the group
+                {t('participantCodeHelper')}
               </p>
             </div>
 
@@ -98,7 +102,7 @@ const MyAssignment = () => {
               disabled={loading}
               className="w-full h-14 text-xl bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary"
             >
-              {loading ? "Loading..." : "View My Assignment"}
+              {loading ? t('loading') : t('viewMyAssignmentButton')}
             </Button>
           </div>
         </ChristmasCard>

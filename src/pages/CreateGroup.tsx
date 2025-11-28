@@ -7,10 +7,13 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const CreateGroup = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [groupName, setGroupName] = useState("");
   const [creatorName, setCreatorName] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,7 +21,7 @@ const CreateGroup = () => {
   const handleCreateGroup = async () => {
     if (!groupName.trim() || !creatorName.trim()) {
       toast({
-        title: "Please fill in all fields",
+        title: t('fillAllFields'),
         variant: "destructive"
       });
       return;
@@ -60,14 +63,14 @@ const CreateGroup = () => {
       if (participantError) throw participantError;
 
       toast({
-        title: "Group created successfully!",
-        description: `Share code: ${groupCode}`
+        title: t('groupCreatedSuccess'),
+        description: `${t('shareCode')}: ${groupCode}`
       });
 
       navigate(`/group/${group.id}?participant_code=${participantCode}`);
     } catch (error: any) {
       toast({
-        title: "Error creating group",
+        title: t('errorCreatingGroup'),
         description: error.message,
         variant: "destructive"
       });
@@ -78,6 +81,7 @@ const CreateGroup = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+      <LanguageSwitcher />
       <div className="container mx-auto px-4 py-12 max-w-2xl">
         <Button 
           variant="ghost" 
@@ -85,7 +89,7 @@ const CreateGroup = () => {
           className="mb-8 text-lg"
         >
           <ArrowLeft className="w-5 h-5 mr-2" />
-          Back
+          {t('back')}
         </Button>
 
         <ChristmasCard>
@@ -93,17 +97,17 @@ const CreateGroup = () => {
             <Gift className="w-16 h-16 text-primary" />
           </div>
           
-          <h1 className="text-4xl font-bold text-center mb-3">Create New Group</h1>
+          <h1 className="text-4xl font-bold text-center mb-3">{t('createNewGroup')}</h1>
           <p className="text-center text-lg text-muted-foreground mb-8">
-            Start a Secret Santa for your family
+            {t('createNewGroupDesc')}
           </p>
 
           <div className="space-y-6">
             <div className="space-y-3">
-              <Label htmlFor="groupName" className="text-lg">Group Name</Label>
+              <Label htmlFor="groupName" className="text-lg">{t('groupName')}</Label>
               <Input
                 id="groupName"
-                placeholder="e.g., Smith Family Christmas 2024"
+                placeholder={t('groupNamePlaceholder')}
                 className="h-14 text-lg"
                 value={groupName}
                 onChange={(e) => setGroupName(e.target.value)}
@@ -111,10 +115,10 @@ const CreateGroup = () => {
             </div>
 
             <div className="space-y-3">
-              <Label htmlFor="creatorName" className="text-lg">Your Name</Label>
+              <Label htmlFor="creatorName" className="text-lg">{t('yourName')}</Label>
               <Input
                 id="creatorName"
-                placeholder="e.g., John"
+                placeholder={t('yourNamePlaceholder')}
                 className="h-14 text-lg"
                 value={creatorName}
                 onChange={(e) => setCreatorName(e.target.value)}
@@ -126,7 +130,7 @@ const CreateGroup = () => {
               disabled={loading}
               className="w-full h-14 text-xl bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary"
             >
-              {loading ? "Creating..." : "Create Group"}
+              {loading ? t('creating') : t('createGroupButton')}
             </Button>
           </div>
         </ChristmasCard>
